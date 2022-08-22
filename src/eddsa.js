@@ -150,7 +150,7 @@ class Eddsa {
         const A = this.babyJub.mulPointEscalar(this.babyJub.Base8, Scalar.shr(s, 3));
 
         const composeBuff = new Uint8Array(32 + msg.length);
-        composeBuff.set(sBuff.slice(32), 0);
+        composeBuff.set(sBuff.slice(0), 32);
         F.toRprLE(composeBuff, 32, msg);
         const rBuff = crypto.createHash('sha256').update(Buffer.from(composeBuff)).digest();
         let r = Scalar.mod(Scalar.fromRprLE(rBuff, 0, 32), this.babyJub.subOrder);
