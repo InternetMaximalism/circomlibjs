@@ -95,11 +95,8 @@ describe("EdDSA js test", function () {
     it("Sign (using Poseidon) to F.e(1)", () => {
         const F = eddsa.babyJub.F;
         const msgBuf = fromHexString("0100105c9e139eb220b73f3160b40bcb04d7ffca70f5978e896e506e24ea3330"); // F.e(1)
-        console.log("msgBuf:", msgBuf);
-        const msgScalar = Scalar.fromRprLE(msgBuf, 0);
-        console.log("msgScalar:", msgScalar);
-        const msg = F.e(msgScalar);
-        console.log("msg:", Buffer.from(msg).toString("hex"));
+        const msg = F.e(Scalar.fromRprLE(msgBuf, 0));
+        assert.equal(Buffer.from(msg).toString("hex"), "0000000000000000000000000000000000000000000000000000000000000001");
 
         //  const prvKey = crypto.randomBytes(32);
 
@@ -115,11 +112,11 @@ describe("EdDSA js test", function () {
 
         const signature = eddsa.signPoseidon(prvKey, msg);
 
-        // assert(F.eq(signature.R8[0], F.e("14912433543938312892253433221595649502191805434744400916320858340963708903405")));
-        // // console.log(F.toString(signature.R8[1]));
-        // assert(F.eq(signature.R8[1], F.e("17858965943805078502965389429364548292533041582201285272843856055529454259328")));
-        // // console.log(Scalar.toString(signature.S));
-        // assert(Scalar.eq(signature.S, Scalar.e("2064552818548881709952691052207091855126437691923743153565018691634475028895")));
+        assert(F.eq(signature.R8[0], F.e("0xb372846449b6a2a8c1c38613d79a5d0817d68b5aa65eedc87ce43c0a7cc0940")));
+        // console.log(F.toString(signature.R8[1]));
+        assert(F.eq(signature.R8[1], F.e("0x27011e073cb19b68f3569f7e955982d7d95210b5cb38a4fa310c20dfb645c0aa")));
+        // console.log(Scalar.toString(signature.S));
+        assert(Scalar.eq(signature.S, Scalar.e("0x00b94449c7f01c28626c72fd926afb5249e8c485ee87105edfa2af0dd891da76")));
 
         const pSignature = eddsa.packSignature(signature);
 
