@@ -92,36 +92,37 @@ describe("EdDSA js test", function () {
 
     });
 
-    it("Sign (using Poseidon) a single 10 bytes from 0 to 9", () => {
+    it("Sign (using Poseidon) to F.e(1)", () => {
         const F = eddsa.babyJub.F;
-        const msgBuf = fromHexString("000102030405060708090000");
-
-        const msg = eddsa.babyJub.F.e(Scalar.fromRprLE(msgBuf, 0));
+        const msgBuf = fromHexString("0100105c9e139eb220b73f3160b40bcb04d7ffca70f5978e896e506e24ea3330"); // F.e(1)
+        const msg = F.e(Scalar.fromRprLE(msgBuf, 0));
+        assert.equal(Buffer.from(msg).toString("hex"), "0000000000000000000000000000000000000000000000000000000000000001");
 
         //  const prvKey = crypto.randomBytes(32);
 
-        const prvKey = Buffer.from("0001020304050607080900010203040506070809000102030405060708090001", "hex");
+        const prvKey = Buffer.from("0000000000000000000000000000000000000000000000000000000000000001", "hex");
 
         const pubKey = eddsa.prvTopub(prvKey);
 
-        assert(F.eq(pubKey[0], F.e("21028084529992666658838450708111181288894794238583826327272579228405391530520")));
-        assert(F.eq(pubKey[1], F.e("1228241568792603552030910053169330041440058095869520755885497545691598261384")));
+        // assert(F.eq(pubKey[0], F.e("13277427435165878497778222415993513565335242147425444199013288855685581939618")));
+        assert(F.eq(pubKey[1], F.e("0x13c207a69f6e609215e86cc1ff67d860ea5fe371fcf744b3752b7b6f39035ae7")));
 
         const pPubKey = eddsa.babyJub.packPoint(pubKey);
+        assert.equal(Buffer.from(pPubKey).toString("hex"), "e75a03396f7b2b75b344f7fc71e35fea60d867ffc16ce81592606e9fa607c213");
 
         const signature = eddsa.signPoseidon(prvKey, msg);
 
-        assert(F.eq(signature.R8[0], F.e("14912433543938312892253433221595649502191805434744400916320858340963708903405")));
+        assert(F.eq(signature.R8[0], F.e("0xb372846449b6a2a8c1c38613d79a5d0817d68b5aa65eedc87ce43c0a7cc0940")));
         // console.log(F.toString(signature.R8[1]));
-        assert(F.eq(signature.R8[1], F.e("17858965943805078502965389429364548292533041582201285272843856055529454259328")));
+        assert(F.eq(signature.R8[1], F.e("0x27011e073cb19b68f3569f7e955982d7d95210b5cb38a4fa310c20dfb645c0aa")));
         // console.log(Scalar.toString(signature.S));
-        assert(Scalar.eq(signature.S, Scalar.e("2064552818548881709952691052207091855126437691923743153565018691634475028895")));
+        assert(Scalar.eq(signature.S, Scalar.e("0x00b94449c7f01c28626c72fd926afb5249e8c485ee87105edfa2af0dd891da76")));
 
         const pSignature = eddsa.packSignature(signature);
 
         assert.equal(toHexString(pSignature), "" +
-            "804c6d92a247449ac4a3d89e729e2092e76e6e0e1c54ded7be429e3c07d17ba7" +
-            "9fd17b45b7d1ebb4bf80c864e9af16eaaa3cbe184e1c5e353df13a21d87e9004");
+            "aac045b6df200c31faa438cbb51052d9d78259957e9f56f3689bb13c071e0127" +
+            "76da91d80dafa2df5e1087ee85c4e84952fb6a92fd726c62281cf0c74944b900");
 
         const uSignature = eddsa.unpackSignature(pSignature);
         assert(eddsa.verifyPoseidon(msg, uSignature, pubKey));
